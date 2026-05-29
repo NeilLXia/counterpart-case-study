@@ -1,4 +1,0 @@
-pandas
-typing
-dataclasses
-pytest

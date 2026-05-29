@@ -1,2 +1,0 @@
-[console_scripts]
-rate = rater_example.cli:main
