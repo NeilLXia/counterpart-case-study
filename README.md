@@ -26,6 +26,11 @@ data/default_tables/
 ├── limit_retention_factor.csv  # Limit/retention amount → factor
 └── industry_factor.csv         # Industry group → factor
 
+data/updated_tables/
+├── base_premium.csv            # Asset size → base rate
+├── limit_retention_factor.csv  # Limit/retention amount → factor
+└── industry_factor.csv         # Industry group → factor (updated for loss triangle data)
+
 testing/
 ├── test_rating_engine.py
 ├── test_rating_tables.py
@@ -78,10 +83,10 @@ Final premium: 4648.79
 ### Python API
 
 ```python
-from rater_example.table_loader import load_tables_from_csv
-from rater_example.rating_engine import Rater, RiskInput
+from rater_example.rating_engine import Rater, RiskInput, PremiumResult
+from rater_example.rating_tables import RatingTables
 
-tables = load_tables_from_csv("data/default_tables")
+tables = RatingTables.from_csv_dir("data/updated_tables")
 rater = Rater(tables)
 
 result = rater.execute(RiskInput(
@@ -107,6 +112,10 @@ Tables are CSV files loaded from a directory. The default tables ship in `data/d
 To use custom tables, point `--table-dir` at a directory containing CSVs with these column names. The `RatingTables` class validates column presence and types on construction.
 
 **Default industry groups:** `Hazard Group 1` (1.00×), `Hazard Group 2` (1.25×), `Hazard Group 3` (1.50×)
+
+Updated factors are given in `data/updated_tables/` where the industry factors are updated as follows:
+
+**Updated industry groups:** `Hazard Group 1` (0.935x), `Hazard Group 2` (1.276×), `Hazard Group 3` (1.50×)
 
 ## Running Tests
 
