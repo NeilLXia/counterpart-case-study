@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rating_example"
+version = "0.1.0"
+description = "Insurance rating engine for loading rating tables, updating industry factors from loss triangles, and calculating revised premiums."
+readme = "README.md"
+requires-python = ">=3.9.6"
+dependencies = ["pandas", "typing", "dataclasses", "pytest"]
+
+[project.scripts]
+rate = "rater_example.cli:main"
