@@ -1,3 +1,7 @@
+'''
+This is a general helper function that reads in a specified list of files to import from a given path.
+'''
+
 from pathlib import Path
 from typing import Union
 

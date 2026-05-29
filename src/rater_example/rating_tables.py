@@ -3,6 +3,8 @@ This module handles the rating tables
 
 It validates rating tables for proper format at construction
 and exposes typed lookup methods used by the rating engine.
+
+Currently, values are coerced to numeric when specified as such so "10" will be interpreted as 10. This is a design choice to allow for more flexibility in the input tables, however can expose the module to more input risk.
 """
 
 from dataclasses import dataclass
@@ -42,6 +44,8 @@ def _validate_columns(table_name: str, df: pd.DataFrame, schema: dict[str, str])
         raise ValueError(f"{table_name} cannot be empty")
 
     for col, col_type in schema.items():
+
+        # NUMERIC: Ensure values are numeric or can be coerced to numeric
         if col_type == "numeric":
             bad_rows = df[pd.to_numeric(df[col], errors="coerce").isna()]
 
@@ -52,6 +56,7 @@ def _validate_columns(table_name: str, df: pd.DataFrame, schema: dict[str, str])
 
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
+        # CHARACTERS: All values can be coerced to strings, so it simply checks if the definition could've been numeric
         elif col_type == "string":
             numeric_like = pd.to_numeric(df[col], errors="coerce").notna()
 

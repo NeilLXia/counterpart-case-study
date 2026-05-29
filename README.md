@@ -66,6 +66,8 @@ rate --industry "Hazard Group 1" --asset-size 5000000 --limit 500000 --retention
 | `--retention`  | float  | yes      | Retention (deductible) amount                              |
 | `--table-dir`  | string | no       | Path to rating table CSVs (default: `data/default_tables`) |
 
+Note: Inputs (asset-size, limit, retention) that fall in-between numerical table values will calculate a linear-interpolation of the nearest values to estimate the appropriate factor.
+
 **Example output:**
 
 ```
