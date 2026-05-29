@@ -7,7 +7,7 @@ Your required input options are: industry, asset-size, limit, retention, and tab
 
 import argparse
 
-from rater_example.rating_engine import Rater, RiskInput
+from rater_example.rating_engine import Rater
 from rater_example.rating_tables import RatingTables
 
 
@@ -26,24 +26,22 @@ def main() -> None:
 
     rater = Rater(tables)
 
-    risk = RiskInput(
+    result = rater.execute(
         industry=args.industry,
         asset_size=args.asset_size,
         limit=args.limit,
         retention=args.retention,
     )
 
-    result = rater.execute(risk)
-
     print(f"Industry: {result.industry}")
-    print(f"Asset size: {result.asset_size}")
-    print(f"Limit: {result.limit}")
-    print(f"Retention: {result.retention}")
-    print(f"Base premium: {result.base_premium}")
-    print(f"Limit factor: {result.limit_factor}")
-    print(f"Retention factor: {result.retention_factor}")
-    print(f"Industry factor: {result.industry_factor}")
-    print(f"Final premium: {result.final_premium}")
+    print(f"Asset size: ${result.asset_size:,.0f}")
+    print(f"Limit: ${result.limit:,.0f}")
+    print(f"Retention: ${result.retention:,.0f}")
+    print(f"Base premium: ${result.base_premium:,.0f}")
+    print(f"Limit factor: {result.limit_factor:,.3f}")
+    print(f"Retention factor: {result.retention_factor:,.3f}")
+    print(f"Industry factor: {result.industry_factor:,.3f}")
+    print(f"Final premium: ${result.final_premium:,.2f}")
 
 
 if __name__ == "__main__":  # pragma: no cover

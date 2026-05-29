@@ -40,25 +40,22 @@ class Rater:
     ) -> None:
         self.tables = tables
 
-    def execute(self, risk_inputs: RiskInput) -> PremiumResult:
-        base_premium = self.tables.get_base_premium(risk_inputs.asset_size)
-        limit_factor = self.tables.get_limit_factor(
-            risk_inputs.limit
-        )
-        retention_factor = self.tables.get_retention_factor(
-            risk_inputs.retention
-        )
-        industry_factor = self.tables.get_industry_factor(
-            risk_inputs.industry)
+    def execute(self, industry: str, asset_size: float, limit: float, retention: float) -> PremiumResult:
+        risk = RiskInput(industry=industry, asset_size=asset_size, limit=limit, retention=retention)
+
+        base_premium = self.tables.get_base_premium(risk.asset_size)
+        limit_factor = self.tables.get_limit_factor(risk.limit)
+        retention_factor = self.tables.get_retention_factor(risk.retention)
+        industry_factor = self.tables.get_industry_factor(risk.industry)
 
         final_premium = round(base_premium *
                               (limit_factor - retention_factor) * industry_factor * 1.7, 2)
 
         return PremiumResult(
-            industry=risk_inputs.industry,
-            asset_size=risk_inputs.asset_size,
-            limit=risk_inputs.limit,
-            retention=risk_inputs.retention,
+            industry=risk.industry,
+            asset_size=risk.asset_size,
+            limit=risk.limit,
+            retention=risk.retention,
             base_premium=base_premium,
             limit_factor=limit_factor,
             retention_factor=retention_factor,
