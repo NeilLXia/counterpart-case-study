@@ -70,33 +70,42 @@ rate --industry "Hazard Group 1" --asset-size 5000000 --limit 500000 --retention
 
 ```
 Industry: Hazard Group 1
-Asset size: 5000000.0
-Limit: 500000.0
-Retention: 25000.0
-Base premium: 3619
+Asset size: $5,000,000
+Limit: $500,000
+Retention: $25,000
+Base premium: $3,619
 Limit factor: 0.756
-Retention factor: 0.0
-Industry factor: 1.0
-Final premium: 4648.79
+Retention factor: 0.000
+Industry factor: 1.000
+Final premium: $4,651.14
 ```
 
 ### Python API
 
 ```python
-from rater_example.rating_engine import Rater, RiskInput, PremiumResult
+from rater_example.rating_engine import Rater
 from rater_example.rating_tables import RatingTables
 
 tables = RatingTables.from_csv_dir("data/updated_tables")
 rater = Rater(tables)
 
-result = rater.execute(RiskInput(
+result = rater.execute(
     industry="Hazard Group 2",
     asset_size=10_000_000,
     limit=500_000,
     retention=25_000,
-))
+)
 
 print(result.final_premium)
+```
+
+`RiskInput` is also available as a typed dataclass if you want to build and pass inputs around before rating:
+
+```python
+from rater_example.rating_engine import Rater, RiskInput
+
+risk = RiskInput(industry="Hazard Group 2", asset_size=10_000_000, limit=500_000, retention=25_000)
+result = rater.execute(**dataclasses.asdict(risk))
 ```
 
 ## Rating Tables

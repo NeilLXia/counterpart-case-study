@@ -34,17 +34,17 @@ class TestMain:
     def test_output_echoes_asset_size(self, capsys):
         with patch("sys.argv", BASE_ARGV):
             main()
-        assert "1000000" in capsys.readouterr().out
+        assert "$1,000,000" in capsys.readouterr().out
 
     def test_output_echoes_limit(self, capsys):
         with patch("sys.argv", BASE_ARGV):
             main()
-        assert "100000" in capsys.readouterr().out
+        assert "$100,000" in capsys.readouterr().out
 
     def test_output_echoes_retention(self, capsys):
         with patch("sys.argv", BASE_ARGV):
             main()
-        assert "10000" in capsys.readouterr().out
+        assert "$10,000" in capsys.readouterr().out
 
     def test_final_premium_is_numeric(self, capsys):
         with patch("sys.argv", BASE_ARGV):
@@ -52,7 +52,7 @@ class TestMain:
         out = capsys.readouterr().out
         for line in out.splitlines():
             if line.startswith("Final premium:"):
-                float(line.split(":", 1)[1].strip())
+                float(line.split(":", 1)[1].strip().lstrip("$").replace(",", ""))
                 break
         else:
             pytest.fail("Final premium line not found in output")
