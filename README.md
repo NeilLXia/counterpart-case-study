@@ -101,7 +101,7 @@ print(result.final_premium)
 
 ## Rating Tables
 
-Tables are CSV files loaded from a directory. The default tables ship in `data/default_tables/`.
+Tables are CSV files loaded from a directory.
 
 | File                         | Required columns                                   |
 | ---------------------------- | -------------------------------------------------- |
@@ -109,9 +109,11 @@ Tables are CSV files loaded from a directory. The default tables ship in `data/d
 | `limit_retention_factor.csv` | `limit_retention_amount`, `limit_retention_factor` |
 | `industry_factor.csv`        | `industry_group`, `industry_factor`                |
 
-To use custom tables, point `--table-dir` at a directory containing CSVs with these column names. The `RatingTables` class validates column presence and types on construction.
+The default tables ship in `data/default_tables/`.
 
 **Default industry groups:** `Hazard Group 1` (1.00×), `Hazard Group 2` (1.25×), `Hazard Group 3` (1.50×)
+
+To use custom tables, point `--table-dir` at a directory containing CSVs with these column names. The `RatingTables` class validates column presence and types on construction.
 
 Updated factors are given in `data/updated_tables/` where the industry factors are updated as follows:
 

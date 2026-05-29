@@ -36,25 +36,6 @@ class TestMain:
             main()
         assert "1000000" in capsys.readouterr().out
 
-    def test_missing_required_arg_exits(self):
-        # --asset-size is omitted
-        with patch("sys.argv", ["rate", "--industry", "Hazard Group 1",
-                                "--limit", "100000", "--retention", "10000"]):
-            with pytest.raises(SystemExit):
-                main()
-
-    def test_invalid_industry_raises(self):
-        with patch("sys.argv", [
-            "rate",
-            "--industry", "Not A Real Group",
-            "--asset-size", "1000000",
-            "--limit", "100000",
-            "--retention", "10000",
-            "--table-dir", DATA_DIR,
-        ]):
-            with pytest.raises(ValueError, match="No industry factor found"):
-                main()
-
     def test_output_echoes_limit(self, capsys):
         with patch("sys.argv", BASE_ARGV):
             main()
@@ -76,6 +57,13 @@ class TestMain:
         else:
             pytest.fail("Final premium line not found in output")
 
+    def test_missing_required_arg_exits(self):
+        # --asset-size is omitted
+        with patch("sys.argv", ["rate", "--industry", "Hazard Group 1",
+                                "--limit", "100000", "--retention", "10000"]):
+            with pytest.raises(SystemExit):
+                main()
+
     def test_missing_limit_arg_exits(self):
         with patch("sys.argv", ["rate", "--industry", "Hazard Group 1",
                                 "--asset-size", "1000000", "--retention", "10000"]):
@@ -86,6 +74,18 @@ class TestMain:
         with patch("sys.argv", ["rate", "--industry", "Hazard Group 1",
                                 "--asset-size", "1000000", "--limit", "100000"]):
             with pytest.raises(SystemExit):
+                main()
+
+    def test_invalid_industry_raises(self):
+        with patch("sys.argv", [
+            "rate",
+            "--industry", "Not A Real Group",
+            "--asset-size", "1000000",
+            "--limit", "100000",
+            "--retention", "10000",
+            "--table-dir", DATA_DIR,
+        ]):
+            with pytest.raises(ValueError, match="No industry factor found"):
                 main()
 
     def test_invalid_asset_size_raises(self):
@@ -122,6 +122,19 @@ class TestMain:
             "--asset-size", "1000000",
             "--limit", "100000",
             "--retention", "9999999",
+            "--table-dir", DATA_DIR,
+        ]):
+            with pytest.raises(ValueError, match="outside the table range"):
+                main()
+
+    def test_negative_asset_size_raises(self):
+        # 9999999 exceeds the retention table maximum of 5000000
+        with patch("sys.argv", [
+            "rate",
+            "--industry", "Hazard Group 1",
+            "--asset-size", "-1000000",
+            "--limit", "100000",
+            "--retention", "10000",
             "--table-dir", DATA_DIR,
         ]):
             with pytest.raises(ValueError, match="outside the table range"):

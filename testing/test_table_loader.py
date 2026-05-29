@@ -26,15 +26,15 @@ class TestLoadRatingTablesFromCsv:
         assert "limit_retention_amount" in tables["limit_factors"].columns
         assert "limit_retention_factor" in tables["limit_factors"].columns
 
-    def test_industry_factors_has_expected_columns(self):
-        tables = load_tables_from_csv(DATA_DIR)
-        assert "industry_group" in tables["industry_factors"].columns
-        assert "industry_factor" in tables["industry_factors"].columns
-
     def test_retention_factors_has_expected_columns(self):
         tables = load_tables_from_csv(DATA_DIR)
         assert "limit_retention_amount" in tables["retention_factors"].columns
         assert "limit_retention_factor" in tables["retention_factors"].columns
+
+    def test_industry_factors_has_expected_columns(self):
+        tables = load_tables_from_csv(DATA_DIR)
+        assert "industry_group" in tables["industry_factors"].columns
+        assert "industry_factor" in tables["industry_factors"].columns
 
     def test_tables_are_not_empty(self):
         tables = load_tables_from_csv(DATA_DIR)
@@ -48,7 +48,8 @@ class TestLoadRatingTablesFromCsv:
         bp = tables["base_premiums"]
         assert bp[bp["asset_size"] == 1000000]["base_rate"].iloc[0] == 1819
         ind = tables["industry_factors"]
-        assert ind[ind["industry_group"] == "Hazard Group 1"]["industry_factor"].iloc[0] == 1.00
+        assert ind[ind["industry_group"] ==
+                   "Hazard Group 1"]["industry_factor"].iloc[0] == 1.00
 
 
 class TestMissingTableFiles:

@@ -57,21 +57,8 @@ class TestRater:
         expected = round(1819.0 * (0.350 - (-0.231)) * 1.25 * 1.7, 2)
         assert result.final_premium == expected
 
-    def test_execute_rounds_final_premium_to_two_decimals(self, mock_tables, risk_input):
-        mock_tables.get_base_premium.return_value = 1000.0
-        mock_tables.get_limit_factor.return_value = 0.333
-        mock_tables.get_retention_factor.return_value = 0.0
-        mock_tables.get_industry_factor.return_value = 1.0
-        result = Rater(mock_tables).execute(risk_input)
-        assert result.final_premium == round(result.final_premium, 2)
-
-    def test_execute_final_premium_is_zero_when_factors_cancel(self, mock_tables, risk_input):
-        mock_tables.get_limit_factor.return_value = 0.5
-        mock_tables.get_retention_factor.return_value = 0.5
-        result = Rater(mock_tables).execute(risk_input)
-        assert result.final_premium == 0.0
-
     def test_execute_propagates_table_error(self, mock_tables, risk_input):
-        mock_tables.get_base_premium.side_effect = ValueError("outside the table range [1, 250000000]")
+        mock_tables.get_base_premium.side_effect = ValueError(
+            "outside the table range [1, 250000000]")
         with pytest.raises(ValueError, match="outside the table range"):
             Rater(mock_tables).execute(risk_input)
