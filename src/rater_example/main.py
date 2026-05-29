@@ -1,8 +1,14 @@
+"""
+The main function allows for the user to run the package directly using a CLI command
+run: "pip install -e ." to install and then use the "rate" command in the CLI
+
+Your required input options are: industry, asset-size, limit, retention, and table-dir (expressed as a path from src)
+"""
+
 import argparse
 
 from rater_example.rating_engine import Rater, RiskInput
 from rater_example.rating_tables import RatingTables
-from rater_example.table_loader import load_rating_tables_from_csv
 
 
 def main() -> None:
@@ -16,7 +22,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    tables = load_rating_tables_from_csv(args.table_dir)
+    tables = RatingTables.from_csv_dir(args.table_dir)
 
     rater = Rater(tables)
 
@@ -40,5 +46,5 @@ def main() -> None:
     print(f"Final premium: {result.final_premium}")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

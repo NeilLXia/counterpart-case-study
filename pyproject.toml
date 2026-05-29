@@ -11,4 +11,4 @@ requires-python = ">=3.9.6"
 dependencies = ["pandas", "typing", "dataclasses", "pytest"]
 
 [project.scripts]
-rate = "rater_example.cli:main"
+rate = "rater_example.main:main"

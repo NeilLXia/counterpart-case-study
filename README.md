@@ -1,0 +1,115 @@
+# Insurance Rating Engine
+
+A Python-based insurance premium rating engine that calculates final premiums from risk inputs and configurable rating tables.
+
+## Overview
+
+The engine computes a final premium using the formula:
+
+```
+final_premium = base_premium × (limit_factor − retention_factor) × industry_factor × 1.7
+```
+
+Factors are looked up from CSV-based rating tables keyed on asset size, limit/retention amounts, and industry group.
+
+## Project Structure
+
+```
+src/rater_example/
+├── rating_engine.py    # Rater class, RiskInput and PremiumResult dataclasses
+├── rating_tables.py    # RatingTables dataclass with validation and lookups
+├── table_loader.py     # Loads RatingTables from a directory of CSVs
+└── main.py             # Entry point for the `rate` CLI command
+
+data/default_tables/
+├── base_premium.csv            # Asset size → base rate
+├── limit_retention_factor.csv  # Limit/retention amount → factor
+└── industry_factor.csv         # Industry group → factor
+
+testing/
+├── test_rating_engine.py
+├── test_rating_tables.py
+├── test_table_loader.py
+└── test_main.py
+```
+
+## Installation
+
+Requires Python 3.9.6+.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+## Usage
+
+### CLI
+
+```bash
+rate --industry "Hazard Group 1" --asset-size 5000000 --limit 500000 --retention 25000
+```
+
+**Arguments:**
+
+| Argument       | Type   | Required | Description                                                |
+| -------------- | ------ | -------- | ---------------------------------------------------------- |
+| `--industry`   | string | yes      | Industry group (e.g. `Hazard Group 1`)                     |
+| `--asset-size` | float  | yes      | Total asset size in dollars                                |
+| `--limit`      | float  | yes      | Policy limit amount                                        |
+| `--retention`  | float  | yes      | Retention (deductible) amount                              |
+| `--table-dir`  | string | no       | Path to rating table CSVs (default: `data/default_tables`) |
+
+**Example output:**
+
+```
+Industry: Hazard Group 1
+Asset size: 5000000.0
+Limit: 500000.0
+Retention: 25000.0
+Base premium: 3619
+Limit factor: 0.756
+Retention factor: 0.0
+Industry factor: 1.0
+Final premium: 4648.79
+```
+
+### Python API
+
+```python
+from rater_example.table_loader import load_tables_from_csv
+from rater_example.rating_engine import Rater, RiskInput
+
+tables = load_tables_from_csv("data/default_tables")
+rater = Rater(tables)
+
+result = rater.execute(RiskInput(
+    industry="Hazard Group 2",
+    asset_size=10_000_000,
+    limit=500_000,
+    retention=25_000,
+))
+
+print(result.final_premium)
+```
+
+## Rating Tables
+
+Tables are CSV files loaded from a directory. The default tables ship in `data/default_tables/`.
+
+| File                         | Required columns                                   |
+| ---------------------------- | -------------------------------------------------- |
+| `base_premium.csv`           | `asset_size`, `base_rate`                          |
+| `limit_retention_factor.csv` | `limit_retention_amount`, `limit_retention_factor` |
+| `industry_factor.csv`        | `industry_group`, `industry_factor`                |
+
+To use custom tables, point `--table-dir` at a directory containing CSVs with these column names. The `RatingTables` class validates column presence and types on construction.
+
+**Default industry groups:** `Hazard Group 1` (1.00×), `Hazard Group 2` (1.25×), `Hazard Group 3` (1.50×)
+
+## Running Tests
+
+```bash
+pytest testing/
+```

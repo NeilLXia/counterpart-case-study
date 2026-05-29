@@ -1,3 +1,10 @@
+"""
+This module handles the rating engine
+
+The rating engine takes rating tables as an instantiation input
+and exposes an execute function for users when imported as a package
+"""
+
 from dataclasses import dataclass
 from typing import Any
 

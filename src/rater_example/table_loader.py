@@ -1,22 +1,29 @@
 from pathlib import Path
+from typing import Union
 
 import pandas as pd
 
-from rater_example.rating_tables import RatingTables
+TABLE_FILES = {
+    "base_premiums": "base_premium.csv",
+    "limit_factors": "limit_retention_factor.csv",
+    "retention_factors": "limit_retention_factor.csv",
+    "industry_factors": "industry_factor.csv",
+}
 
 
-def load_rating_tables_from_csv(table_dir: str) -> RatingTables:
-    table_dir = Path(table_dir)
+def _read_csv_table(path: Path, table_name: str) -> pd.DataFrame:
+    try:
+        return pd.read_csv(path)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"{table_name} file not found: {path}")
+    except pd.errors.EmptyDataError:
+        raise ValueError(f"{table_name} file is empty: {path}")
+    except pd.errors.ParserError as e:
+        raise ValueError(f"{table_name} file could not be parsed: {path}. {e}")
 
-    base_premium_table = pd.read_csv(table_dir / "base_premium.csv")
-    limit_factor_table = pd.read_csv(table_dir / "limit_retention_factor.csv")
-    retention_factor_table = pd.read_csv(
-        table_dir / "limit_retention_factor.csv")
-    industry_factor_table = pd.read_csv(table_dir / "industry_factor.csv")
 
-    return RatingTables(
-        base_premium_table=base_premium_table,
-        limit_factor_table=limit_factor_table,
-        retention_factor_table=retention_factor_table,
-        industry_factor_table=industry_factor_table,
-    )
+def load_tables_from_csv(table_dir: Union[str, Path]) -> dict[str, pd.DataFrame]:
+    return {
+        table_name: _read_csv_table(Path(table_dir) / file_name, table_name)
+        for table_name, file_name in TABLE_FILES.items()
+    }
