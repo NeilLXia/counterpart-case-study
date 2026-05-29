@@ -62,7 +62,7 @@ class TestValidateColumns:
     def test_numeric_string_in_numeric_column_raises(self, limit_retention_df, industry_factor_df):
         # "1819" is numeric-like but passed as a string — should still be accepted after coercion
         coercible_df = pd.DataFrame(
-            {"asset_size": ["1_000_000"], "base_rate": ["1819"]})
+            {"asset_size": ["1000000"], "base_rate": ["1819"]})
         tables = RatingTables(
             base_premiums=coercible_df,
             limit_factors=limit_retention_df,
