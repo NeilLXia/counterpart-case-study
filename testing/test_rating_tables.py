@@ -91,6 +91,49 @@ class TestValidateColumns:
         with pytest.raises(ValueError, match="Unsupported type"):
             _validate_columns("test table", df, {"col": "boolean"})
 
+    def test_duplicate_base_premium_key_raises(self, limit_retention_df, industry_factor_df):
+        duplicate_df = pd.DataFrame({
+            "asset_size": [1_000_000, 1_000_000],
+            "base_rate": [1819, 2000],
+        })
+        with pytest.raises(ValueError, match="duplicate values.*asset_size"):
+            RatingTables(
+                base_premiums=duplicate_df,
+                limit_factors=limit_retention_df,
+                retention_factors=limit_retention_df,
+                industry_factors=industry_factor_df,
+            )
+
+    def test_duplicate_limit_retention_key_raises(self, industry_factor_df):
+        base_df = pd.DataFrame(
+            {"asset_size": [1_000_000], "base_rate": [1819]})
+        duplicate_df = pd.DataFrame({
+            "limit_retention_amount": [10_000, 10_000],
+            "limit_retention_factor": [-0.231, -0.200],
+        })
+        with pytest.raises(ValueError, match="duplicate values.*limit_retention_amount"):
+            RatingTables(
+                base_premiums=base_df,
+                limit_factors=duplicate_df,
+                retention_factors=duplicate_df,
+                industry_factors=industry_factor_df,
+            )
+
+    def test_duplicate_industry_group_raises(self, limit_retention_df):
+        base_df = pd.DataFrame(
+            {"asset_size": [1_000_000], "base_rate": [1819]})
+        duplicate_industry_df = pd.DataFrame({
+            "industry_group": ["Hazard Group 1", "Hazard Group 1"],
+            "industry_factor": [1.0, 1.25],
+        })
+        with pytest.raises(ValueError, match="duplicate values.*industry_group"):
+            RatingTables(
+                base_premiums=base_df,
+                limit_factors=limit_retention_df,
+                retention_factors=limit_retention_df,
+                industry_factors=duplicate_industry_df,
+            )
+
     def test_valid_tables_construct_successfully(self, rating_tables):
         assert rating_tables is not None
 

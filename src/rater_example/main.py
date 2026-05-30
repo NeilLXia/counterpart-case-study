@@ -6,9 +6,12 @@ Your required input options are: industry, asset-size, limit, retention, and tab
 """
 
 import argparse
+from pathlib import Path
 
 from rater_example.rating_engine import Rater
 from rater_example.rating_tables import RatingTables
+
+DEFAULT_TABLE_DIR = Path(__file__).resolve().parents[2] / "data" / "default_tables"
 
 
 def main() -> None:
@@ -18,7 +21,7 @@ def main() -> None:
     parser.add_argument("--asset-size", type=float, required=True)
     parser.add_argument("--limit", type=float, required=True)
     parser.add_argument("--retention", type=float, required=True)
-    parser.add_argument("--table-dir", default="data/default_tables")
+    parser.add_argument("--table-dir", default=DEFAULT_TABLE_DIR)
 
     args = parser.parse_args()
 

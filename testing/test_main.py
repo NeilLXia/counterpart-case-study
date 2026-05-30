@@ -57,6 +57,19 @@ class TestMain:
         else:
             pytest.fail("Final premium line not found in output")
 
+    def test_default_table_dir_works_outside_repo_root(self, capsys, monkeypatch, tmp_path):
+        argv = [
+            "rate",
+            "--industry", "Hazard Group 1",
+            "--asset-size", "1000000",
+            "--limit", "100000",
+            "--retention", "10000",
+        ]
+        monkeypatch.chdir(tmp_path)
+        with patch("sys.argv", argv):
+            main()
+        assert "Final premium:" in capsys.readouterr().out
+
     def test_missing_required_arg_exits(self):
         # --asset-size is omitted
         with patch("sys.argv", ["rate", "--industry", "Hazard Group 1",
@@ -115,13 +128,13 @@ class TestMain:
                 main()
 
     def test_invalid_retention_raises(self):
-        # 9999999 exceeds the retention table maximum of 5000000
+        # -1 is below the retention table minimum of 0
         with patch("sys.argv", [
             "rate",
             "--industry", "Hazard Group 1",
             "--asset-size", "1000000",
             "--limit", "100000",
-            "--retention", "9999999",
+            "--retention", "-1",
             "--table-dir", DATA_DIR,
         ]):
             with pytest.raises(ValueError, match="outside the table range"):

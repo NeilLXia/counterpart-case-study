@@ -74,6 +74,14 @@ def _validate_columns(table_name: str, df: pd.DataFrame, schema: dict[str, str])
     return df
 
 
+def _validate_unique_key(table_name: str, df: pd.DataFrame, key_column: str) -> None:
+    duplicated = df.loc[df[key_column].duplicated(), key_column].tolist()
+    if duplicated:
+        raise ValueError(
+            f"{table_name} contains duplicate values in '{key_column}': {duplicated}"
+        )
+
+
 @dataclass
 class RatingTables:
     base_premiums: pd.DataFrame
@@ -101,6 +109,14 @@ class RatingTables:
             "Retention Factor Table", self.retention_factors, limit_retention_factor_schema)
         self.industry_factors = _validate_columns(
             "Industry Factor Table", self.industry_factors, industry_factor_schema)
+
+        _validate_unique_key("Base Premium Table", self.base_premiums, "asset_size")
+        _validate_unique_key(
+            "Limit Factor Table", self.limit_factors, "limit_retention_amount")
+        _validate_unique_key(
+            "Retention Factor Table", self.retention_factors, "limit_retention_amount")
+        _validate_unique_key(
+            "Industry Factor Table", self.industry_factors, "industry_group")
 
     def get_base_premium(self, asset_size: float) -> float:
         df = self.base_premiums.sort_values("asset_size")

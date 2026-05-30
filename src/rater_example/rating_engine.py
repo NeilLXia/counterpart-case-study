@@ -6,9 +6,7 @@ and exposes an execute function for users when imported as a package
 """
 
 from dataclasses import dataclass
-from typing import Any
 
-import pandas as pd
 from rater_example.rating_tables import RatingTables
 
 
@@ -34,22 +32,29 @@ class PremiumResult:
 
 
 class Rater:
-    def __init__(
-        self,
-        tables: RatingTables
-    ) -> None:
+    def __init__(self, tables: RatingTables) -> None:
         self.tables = tables
 
     def execute(self, industry: str, asset_size: float, limit: float, retention: float) -> PremiumResult:
-        risk = RiskInput(industry=industry, asset_size=asset_size, limit=limit, retention=retention)
+        if retention > limit:
+            raise ValueError("Retention cannot exceed limit")
+
+        risk = RiskInput(
+            industry=industry,
+            asset_size=asset_size,
+            limit=limit,
+            retention=retention,
+        )
 
         base_premium = self.tables.get_base_premium(risk.asset_size)
         limit_factor = self.tables.get_limit_factor(risk.limit)
         retention_factor = self.tables.get_retention_factor(risk.retention)
         industry_factor = self.tables.get_industry_factor(risk.industry)
 
-        final_premium = round(base_premium *
-                              (limit_factor - retention_factor) * industry_factor * 1.7, 2)
+        final_premium = round(
+            base_premium * (limit_factor - retention_factor) * industry_factor * 1.7,
+            2,
+        )
 
         return PremiumResult(
             industry=risk.industry,

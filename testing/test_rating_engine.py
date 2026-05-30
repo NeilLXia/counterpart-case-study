@@ -58,6 +58,12 @@ class TestRater:
         expected = round(1819.0 * (0.350 - (-0.231)) * 1.25 * 1.7, 2)
         assert result.final_premium == expected
 
+    def test_execute_rejects_retention_above_limit(self, mock_tables, risk_input):
+        risk_input.retention = risk_input.limit + 1
+        with pytest.raises(ValueError, match="Retention cannot exceed limit"):
+            Rater(mock_tables).execute(**dataclasses.asdict(risk_input))
+        mock_tables.get_base_premium.assert_not_called()
+
     def test_execute_propagates_table_error(self, mock_tables, risk_input):
         mock_tables.get_base_premium.side_effect = ValueError(
             "outside the table range [1, 250000000]")

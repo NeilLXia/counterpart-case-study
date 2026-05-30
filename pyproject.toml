@@ -8,7 +8,10 @@ version = "0.1.0"
 description = "Insurance rating engine for loading rating tables, updating industry factors from loss triangles, and calculating revised premiums."
 readme = "README.md"
 requires-python = ">=3.9.6"
-dependencies = ["pandas", "typing", "dataclasses", "pytest"]
+dependencies = ["pandas", "numpy"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
 
 [project.scripts]
 rate = "rater_example.main:main"
