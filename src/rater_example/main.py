@@ -2,16 +2,14 @@
 The main function allows for the user to run the package directly using a CLI command
 run: "pip install -e ." to install and then use the "rate" command in the CLI
 
-Your required input options are: industry, asset-size, limit, retention, and table-dir (expressed as a path from src)
+Your required input options are: industry, asset-size, limit, and retention.
+Use table-dir to override the packaged default rating tables.
 """
 
 import argparse
-from pathlib import Path
 
 from rater_example.rating_engine import Rater
 from rater_example.rating_tables import RatingTables
-
-DEFAULT_TABLE_DIR = Path(__file__).resolve().parents[2] / "data" / "default_tables"
 
 
 def main() -> None:
@@ -21,11 +19,14 @@ def main() -> None:
     parser.add_argument("--asset-size", type=float, required=True)
     parser.add_argument("--limit", type=float, required=True)
     parser.add_argument("--retention", type=float, required=True)
-    parser.add_argument("--table-dir", default=DEFAULT_TABLE_DIR)
+    parser.add_argument("--table-dir")
 
     args = parser.parse_args()
 
-    tables = RatingTables.from_csv_dir(args.table_dir)
+    if args.table_dir:
+        tables = RatingTables.from_csv_dir(args.table_dir)
+    else:
+        tables = RatingTables.from_default_tables()
 
     rater = Rater(tables)
 

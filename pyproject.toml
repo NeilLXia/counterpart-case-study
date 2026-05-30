@@ -15,3 +15,7 @@ dev = ["pytest"]
 
 [project.scripts]
 rate = "rater_example.main:main"
+
+[tool.setuptools.package-data]
+rater_example = ["default_tables/*.csv"]
+

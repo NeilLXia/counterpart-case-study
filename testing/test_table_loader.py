@@ -3,7 +3,7 @@ from pathlib import Path
 from rater_example.table_loader import load_tables_from_csv
 
 
-DATA_DIR = Path(__file__).parent.parent / "data" / "default_tables"
+DATA_DIR = Path(__file__).parent.parent / "src" / "rater_example" / "default_tables"
 
 # Minimal valid CSVs for building partial directories in tmp_path tests
 BASE_PREMIUM_CSV = "asset_size,base_rate\n1000000,1819\n"

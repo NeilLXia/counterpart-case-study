@@ -1,6 +1,6 @@
 from rater_example import Rater, RatingTables
 
-tables = RatingTables.from_csv_dir("data/default_tables")
+tables = RatingTables.from_default_tables()
 tables_updated = RatingTables.from_csv_dir("data/updated_tables")
 rater = Rater(tables)
 rater_updated = Rater(tables_updated)

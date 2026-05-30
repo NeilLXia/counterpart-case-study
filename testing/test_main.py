@@ -4,7 +4,7 @@ from unittest.mock import patch
 from rater_example.main import main
 
 
-DATA_DIR = str(Path(__file__).parent.parent / "data" / "default_tables")
+UPDATED_DATA_DIR = str(Path(__file__).parent.parent / "data" / "updated_tables")
 
 BASE_ARGV = [
     "rate",
@@ -12,7 +12,6 @@ BASE_ARGV = [
     "--asset-size", "1000000",
     "--limit", "100000",
     "--retention", "10000",
-    "--table-dir", DATA_DIR,
 ]
 
 
@@ -96,7 +95,6 @@ class TestMain:
             "--asset-size", "1000000",
             "--limit", "100000",
             "--retention", "10000",
-            "--table-dir", DATA_DIR,
         ]):
             with pytest.raises(ValueError, match="No industry factor found"):
                 main()
@@ -109,7 +107,6 @@ class TestMain:
             "--asset-size", "999999999",
             "--limit", "100000",
             "--retention", "10000",
-            "--table-dir", DATA_DIR,
         ]):
             with pytest.raises(ValueError, match="outside the table range"):
                 main()
@@ -122,7 +119,6 @@ class TestMain:
             "--asset-size", "1000000",
             "--limit", "9999999",
             "--retention", "10000",
-            "--table-dir", DATA_DIR,
         ]):
             with pytest.raises(ValueError, match="outside the table range"):
                 main()
@@ -135,20 +131,23 @@ class TestMain:
             "--asset-size", "1000000",
             "--limit", "100000",
             "--retention", "-1",
-            "--table-dir", DATA_DIR,
         ]):
             with pytest.raises(ValueError, match="outside the table range"):
                 main()
 
     def test_negative_asset_size_raises(self):
-        # 9999999 exceeds the retention table maximum of 5000000
+        # -1000000 is below the asset size table minimum of 1
         with patch("sys.argv", [
             "rate",
             "--industry", "Hazard Group 1",
             "--asset-size", "-1000000",
             "--limit", "100000",
             "--retention", "10000",
-            "--table-dir", DATA_DIR,
         ]):
             with pytest.raises(ValueError, match="outside the table range"):
                 main()
+
+    def test_custom_table_dir_still_loads(self, capsys):
+        with patch("sys.argv", BASE_ARGV + ["--table-dir", UPDATED_DATA_DIR]):
+            main()
+        assert "Industry factor: 0.935" in capsys.readouterr().out

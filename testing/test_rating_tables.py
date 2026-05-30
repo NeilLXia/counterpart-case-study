@@ -1,10 +1,6 @@
 import pytest
 import pandas as pd
-from pathlib import Path
 from rater_example.rating_tables import RatingTables, _validate_columns
-
-DATA_DIR = Path(__file__).parent.parent / "data" / "default_tables"
-
 
 @pytest.fixture
 def limit_retention_df():
@@ -24,7 +20,7 @@ def industry_factor_df():
 
 @pytest.fixture
 def rating_tables():
-    return RatingTables.from_csv_dir(DATA_DIR)
+    return RatingTables.from_default_tables()
 
 
 class TestValidateColumns:
@@ -136,6 +132,10 @@ class TestValidateColumns:
 
     def test_valid_tables_construct_successfully(self, rating_tables):
         assert rating_tables is not None
+
+    def test_default_tables_load_from_package_resources(self):
+        tables = RatingTables.from_default_tables()
+        assert tables.get_industry_factor("Hazard Group 1") == pytest.approx(1.00)
 
 
 class TestGetBasePremium:

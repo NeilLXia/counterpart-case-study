@@ -8,6 +8,7 @@ Currently, values are coerced to numeric when specified as such so "10" will be 
 """
 
 from dataclasses import dataclass
+from importlib import resources
 import warnings
 from pathlib import Path
 from typing import Union
@@ -31,6 +32,8 @@ industry_factor_schema = {
     "industry_group": "string",
     "industry_factor": "numeric"
 }
+
+# Validates the presence and format of data columns and values
 
 
 def _validate_columns(table_name: str, df: pd.DataFrame, schema: dict[str, str]) -> pd.DataFrame:
@@ -100,6 +103,12 @@ class RatingTables:
             industry_factors=tables["industry_factors"],
         )
 
+    @classmethod
+    def from_default_tables(cls) -> "RatingTables":
+        table_dir = resources.files("rater_example") / "default_tables"
+        with resources.as_file(table_dir) as path:
+            return cls.from_csv_dir(path)
+
     def __post_init__(self) -> None:
         self.base_premiums = _validate_columns(
             "Base Premium Table", self.base_premiums, base_premium_schema)
@@ -110,7 +119,8 @@ class RatingTables:
         self.industry_factors = _validate_columns(
             "Industry Factor Table", self.industry_factors, industry_factor_schema)
 
-        _validate_unique_key("Base Premium Table", self.base_premiums, "asset_size")
+        _validate_unique_key("Base Premium Table",
+                             self.base_premiums, "asset_size")
         _validate_unique_key(
             "Limit Factor Table", self.limit_factors, "limit_retention_amount")
         _validate_unique_key(

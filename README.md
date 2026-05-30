@@ -19,12 +19,11 @@ src/rater_example/
 ├── rating_engine.py    # Rater class, RiskInput and PremiumResult dataclasses
 ├── rating_tables.py    # RatingTables dataclass with validation and lookups
 ├── table_loader.py     # Loads RatingTables from a directory of CSVs
-└── main.py             # Entry point for the `rate` CLI command
-
-data/default_tables/
-├── base_premium.csv            # Asset size → base rate
-├── limit_retention_factor.csv  # Limit/retention amount → factor
-└── industry_factor.csv         # Industry group → factor
+├── main.py             # Entry point for the `rate` CLI command
+└── default_tables/     # Packaged default rating tables
+    ├── base_premium.csv
+    ├── limit_retention_factor.csv
+    └── industry_factor.csv
 
 data/updated_tables/
 ├── base_premium.csv            # Asset size → base rate
@@ -64,7 +63,7 @@ rate --industry "Hazard Group 1" --asset-size 5000000 --limit 500000 --retention
 | `--asset-size` | float  | yes      | Total asset size in dollars                                |
 | `--limit`      | float  | yes      | Policy limit amount                                        |
 | `--retention`  | float  | yes      | Retention (deductible) amount                              |
-| `--table-dir`  | string | no       | Path to rating table CSVs (default: `data/default_tables`) |
+| `--table-dir`  | string | no       | Path to custom rating table CSVs. If omitted, packaged default tables are used. |
 
 Note: Inputs (asset-size, limit, retention) that fall in-between numerical table values will calculate a linear-interpolation of the nearest values to estimate the appropriate factor.
 
@@ -88,7 +87,7 @@ Final premium: $4,651.14
 from rater_example.rating_engine import Rater
 from rater_example.rating_tables import RatingTables
 
-tables = RatingTables.from_csv_dir("data/updated_tables")
+tables = RatingTables.from_default_tables()
 rater = Rater(tables)
 
 result = rater.execute(
@@ -120,7 +119,7 @@ Tables are CSV files loaded from a directory.
 | `limit_retention_factor.csv` | `limit_retention_amount`, `limit_retention_factor` |
 | `industry_factor.csv`        | `industry_group`, `industry_factor`                |
 
-The default tables ship in `data/default_tables/`.
+The default tables ship with the package in `src/rater_example/default_tables/` and can be loaded with `RatingTables.from_default_tables()`.
 
 **Default industry groups:** `Hazard Group 1` (1.00×), `Hazard Group 2` (1.25×), `Hazard Group 3` (1.50×)
 <br><br>
